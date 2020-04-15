@@ -176,16 +176,35 @@ def train_and_predict(workload_name, num_queries, num_epochs, batch_size, hid_un
         for i in range(len(preds_test_unnorm)):
             f.write(str(preds_test_unnorm[i]) + "," + label[i] + "\n")
 
+class MainArgs:
+    testsets = ["synthetic", "scale", "job-light"]
+    n_queries = 10000
+    n_epochs = 10
+    batch_size = 1024
+    n_hidden_units = 256
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("testset", help="synthetic, scale, or job-light")
-    parser.add_argument("--queries", help="number of training queries (default: 10000)", type=int, default=10000)
-    parser.add_argument("--epochs", help="number of epochs (default: 10)", type=int, default=10)
-    parser.add_argument("--batch", help="batch size (default: 1024)", type=int, default=1024)
-    parser.add_argument("--hid", help="number of hidden units (default: 256)", type=int, default=256)
-    parser.add_argument("--cuda", help="use CUDA", action="store_true")
-    args = parser.parse_args()
+    def __init__(self, testset="synthetic", queries=n_queries,
+                 epochs=n_epochs, batch=batch_size,
+                 hid=n_hidden_units, cuda=False):
+        self.testset = testset
+        self.queries = queries
+        self.epochs = epochs
+        self.batch = batch
+        self.hid = hid
+        self.cuda = cuda
+
+def main(args=None):
+    if not args:
+        parser = argparse.ArgumentParser()
+        parser.add_argument("testset", help="synthetic, scale, or job-light")
+        parser.add_argument("--queries", help="number of training queries (default: 10000)",
+                            type=int, default=MainArgs.n_queries)
+        parser.add_argument("--epochs", help="number of epochs (default: 10)", type=int, default=MainArgs.n_epochs)
+        parser.add_argument("--batch", help="batch size (default: 1024)", type=int, default=MainArgs.batch_size)
+        parser.add_argument("--hid", help="number of hidden units (default: 256)",
+                            type=int, default=MainArgs.n_hidden_units)
+        parser.add_argument("--cuda", help="use CUDA", action="store_true")
+        args = parser.parse_args()
     train_and_predict(args.testset, args.queries, args.epochs, args.batch, args.hid, args.cuda)
 
 
